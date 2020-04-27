@@ -1,0 +1,83 @@
+{
+    "app-id": "com.github.linarcx.giti",
+    "sdk": "org.gnome.Sdk",
+    "runtime": "org.gnome.Platform",
+    "runtime-version": "3.36",
+    "base": "io.elementary.BaseApp",
+    "base-version": "juno-19.08",
+    "command": "com.github.linarcx.giti",
+    "finish-args": [
+        /* X11 + XShm access */
+        "--share=ipc", "--socket=x11",
+        /* Wayland access */
+        "--socket=wayland",
+        /* We want full fs access for git repositories */
+        "--filesystem=host",
+        /* Required for cloning repositories */
+        "--share=network",
+        /* We need access to auth agents */
+        "--talk-name=org.freedesktop.secrets",
+        "--filesystem=xdg-run/keyring"
+    ],
+    "cleanup": ["/include", "/lib/pkgconfig",
+                "/share/pkgconfig", "/share/aclocal",
+                "/man", "/share/man", "/share/gtk-doc",
+                "/share/vala",
+                "*.la", "*.a"],
+    "modules": [
+        {
+            "name": "libgit2",
+            "buildsystem": "cmake",
+            "config-opts": [ "-DBUILD_SHARED_LIBS:BOOL=ON",
+                             "-DTHREADSAFE=ON" ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://github.com/libgit2/libgit2/releases/download/v1.0.0/libgit2-1.0.0.tar.gz",
+                    "sha256": "6a1fa16a7f6335ce8b2630fbdbb5e57c4027929ebc56fcd1ac55edb141b409b4"
+                }
+            ]
+        },
+        {
+            "name": "libssh2",
+            "buildsystem": "cmake",
+            "config-opts": [ "-DCMAKE_INSTALL_LIBDIR:PATH=/app/lib",
+                             "-DBUILD_SHARED_LIBS:BOOL=ON" ],
+            "sources": [
+                {
+                    /* TODO update */
+                    "type": "archive",
+                    "url": "https://www.libssh2.org/download/libssh2-1.8.2.tar.gz",
+                    "sha256": "088307d9f6b6c4b8c13f34602e8ff65d21c2dc4d55284dfe15d502c4ee190d67"
+                }
+            ]
+        },
+        {
+            "name": "libgit2-glib",
+            "config-opts" : [
+                "--buildtype=debugoptimized"
+            ],
+            "buildsystem" : "meson",
+            "builddir" : true,
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://gitlab.gnome.org/GNOME/libgit2-glib.git",
+                    "commit": "9ee6d9a7317d367e99bbba7c4601205e003173e3"
+                }
+            ]
+        },
+        {
+            "name": "giti",
+            "buildsystem": "meson",
+            "sources": [
+                {
+                    "type": "archive",
+                    "strip-components": 1,
+                    "url": "https://github.com/LinArcX/giti/archive/1.0.0.tar.gz",
+                    "sha256": "8054581f9eddf226a3e16e404ef062ebaba0ea1223255d8b0c3eeac301cf6872"
+                }
+            ]
+        }
+    ]
+}
